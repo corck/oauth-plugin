@@ -108,6 +108,7 @@ module OAuth
           if request.post?
             if user_authorizes_token?
               @token.authorize!(current_user)
+              if @token.client_application.web_application == true
               callback_url  = @token.oob? ? @token.client_application.callback_url : @token.callback_url
               @redirect_url = URI.parse(callback_url) unless callback_url.blank?
 
@@ -118,6 +119,9 @@ module OAuth
                 redirect_to @redirect_url.to_s
               else
                 render :action => "authorize_success"
+              end
+              else
+		render :template => "oauth/authorize_pin"
               end
             else
               @token.invalidate!
